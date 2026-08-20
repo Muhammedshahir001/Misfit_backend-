@@ -1,13 +1,19 @@
 import nodemailer from 'nodemailer';
+import dns from 'node:dns/promises';
+
+const [smtpIPv4] = await dns.resolve4('smtp.gmail.com');
+console.log(`[Email] Resolved smtp.gmail.com to IPv4: ${smtpIPv4}`);
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
+  host: smtpIPv4,
   port: 587,
   secure: false,
-  family: 4,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    servername: 'smtp.gmail.com',
   },
 });
 
