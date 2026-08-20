@@ -95,6 +95,7 @@ export const signup = async (req, res) => {
       console.log(`[OTP] Sent to ${email}`);
     } catch (emailErr) {
       console.error('[OTP] Email send failed:', emailErr.message);
+      return res.status(500).json({ error: 'Failed to send OTP email. Please try again.' });
     }
 
     res.status(201).json({
@@ -187,6 +188,7 @@ export const resendOTP = async (req, res) => {
       console.log(`[OTP] Resent to ${email}`);
     } catch (emailErr) {
       console.error('[OTP] Resend email failed:', emailErr.message);
+      return res.status(500).json({ error: 'Failed to send OTP email. Please try again.' });
     }
 
     res.json({ message: 'OTP resent to your email' });

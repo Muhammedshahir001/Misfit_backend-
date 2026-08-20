@@ -8,6 +8,10 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+transporter.verify()
+  .then(() => console.log('[Email] SMTP connection verified'))
+  .catch((err) => console.error('[Email] SMTP connection failed:', err.message));
+
 export const sendOTP = async (to, otp) => {
   const mailOptions = {
     from: `"MISFITS" <${process.env.EMAIL_USER}>`,
