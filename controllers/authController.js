@@ -94,7 +94,7 @@ export const signup = async (req, res) => {
       await sendOTP(email, otp);
       console.log(`[OTP] Sent to ${email}`);
     } catch (emailErr) {
-      console.error('[OTP] Email send failed:', emailErr.message);
+      console.error('[OTP] Email send failed:', emailErr);
       return res.status(500).json({ error: 'Failed to send OTP email. Please try again.' });
     }
 

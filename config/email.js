@@ -1,6 +1,10 @@
 import nodemailer from 'nodemailer';
 import dns from 'node:dns/promises';
 
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  console.error('[Email] EMAIL_USER or EMAIL_PASS is not set! OTP emails will fail.');
+}
+
 const [smtpIPv4] = await dns.resolve4('smtp.gmail.com');
 console.log(`[Email] Resolved smtp.gmail.com to IPv4: ${smtpIPv4}`);
 
