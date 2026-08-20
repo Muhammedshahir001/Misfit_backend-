@@ -1,13 +1,21 @@
 import { Resend } from 'resend';
 
-if (!process.env.RESEND_API_KEY) {
-  console.error('[Email] RESEND_API_KEY is not set! OTP emails will fail.');
-}
+let resend = null;
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const getResend = () => {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not set in environment variables');
+    }
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+};
 
 export const sendOTP = async (to, otp) => {
-  const { data, error } = await resend.emails.send({
+  const client = getResend();
+
+  const { data, error } = await client.emails.send({
     from: 'MISFITS <onboarding@resend.dev>',
     to,
     subject: 'Your MISFITS Verification Code',
