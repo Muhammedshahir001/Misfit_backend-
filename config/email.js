@@ -1,33 +1,14 @@
-import nodemailer from 'nodemailer';
-import dns from 'node:dns/promises';
+import { Resend } from 'resend';
 
-if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  console.error('[Email] EMAIL_USER or EMAIL_PASS is not set! OTP emails will fail.');
+if (!process.env.RESEND_API_KEY) {
+  console.error('[Email] RESEND_API_KEY is not set! OTP emails will fail.');
 }
 
-const [smtpIPv4] = await dns.resolve4('smtp.gmail.com');
-console.log(`[Email] Resolved smtp.gmail.com to IPv4: ${smtpIPv4}`);
-
-const transporter = nodemailer.createTransport({
-  host: smtpIPv4,
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    servername: 'smtp.gmail.com',
-  },
-});
-
-transporter.verify()
-  .then(() => console.log('[Email] SMTP connection verified'))
-  .catch((err) => console.error('[Email] SMTP connection failed:', err.message));
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendOTP = async (to, otp) => {
-  const mailOptions = {
-    from: `"MISFITS" <${process.env.EMAIL_USER}>`,
+  const { data, error } = await resend.emails.send({
+    from: 'MISFITS <onboarding@resend.dev>',
     to,
     subject: 'Your MISFITS Verification Code',
     html: `
@@ -45,7 +26,11 @@ export const sendOTP = async (to, otp) => {
         </div>
       </div>
     `,
-  };
+  });
 
-  return transporter.sendMail(mailOptions);
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
 };
