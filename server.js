@@ -19,6 +19,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:5000',
+  'https://misfits-c1xursb7e-muhammed-shahir-s-projects.vercel.app',
 ];
 
 app.use(express.json({ limit: '10mb' }));
@@ -53,6 +54,9 @@ app.use('/api/admin', adminRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ error: 'Not allowed by CORS' });
+  }
   console.error('[Server Error]:', err.message);
   res.status(500).json({ error: 'Internal server error' });
 });
