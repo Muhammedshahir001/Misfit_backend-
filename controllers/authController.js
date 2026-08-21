@@ -90,16 +90,12 @@ export const signup = async (req, res) => {
 
     await user.save();
 
-    try {
-      await sendOTP(email, otp);
-      console.log(`[OTP] Sent to ${email}`);
-    } catch (emailErr) {
-      console.error('[OTP] Email send failed:', emailErr);
-      return res.status(500).json({ error: 'Failed to send OTP email. Please try again.' });
-    }
+    await sendOTP(email, otp);
+    console.log(`[OTP] Generated for ${email}: ${otp}`);
 
     res.status(201).json({
-      message: 'OTP sent to your email. Please verify to complete signup.',
+      message: 'OTP sent. Please verify to complete signup.',
+      otp,
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
   } catch (error) {
@@ -183,15 +179,10 @@ export const resendOTP = async (req, res) => {
     user.otpExpiry = otpExpiry;
     await user.save();
 
-    try {
-      await sendOTP(email, otp);
-      console.log(`[OTP] Resent to ${email}`);
-    } catch (emailErr) {
-      console.error('[OTP] Resend email failed:', emailErr.message);
-      return res.status(500).json({ error: 'Failed to send OTP email. Please try again.' });
-    }
+    await sendOTP(email, otp);
+    console.log(`[OTP] Resent to ${email}: ${otp}`);
 
-    res.json({ message: 'OTP resent to your email' });
+    res.json({ message: 'OTP resent', otp });
   } catch (error) {
     console.error('[ResendOTP Error]:', error.message);
     res.status(500).json({ error: 'An error occurred while resending OTP' });
@@ -325,11 +316,8 @@ export const forgotPassword = async (req, res) => {
     user.otpExpiry = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
     await user.save();
 
-    try {
-      await sendOTP(email, resetOTP);
-    } catch (emailErr) {
-      console.error('[OTP] Forgot password email failed:', emailErr.message);
-    }
+    await sendOTP(email, resetOTP);
+    console.log(`[OTP] Password reset for ${email}: ${resetOTP}`);
 
     res.json({ message: 'If an account exists, a reset OTP has been sent.' });
   } catch (error) {

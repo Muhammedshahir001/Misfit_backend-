@@ -23,22 +23,22 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
   'https://misfits-one.vercel.app',
-  'https://misfits-c1xursb7e-muhammed-shahir-s-projects.vercel.app',
 ];
 
 app.use(express.json({ limit: '10mb' }));
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
+
 app.use(helmet());
 
 connectDB();
